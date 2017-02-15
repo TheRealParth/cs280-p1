@@ -8,10 +8,11 @@
 
 #include <iostream>
 #include <string>
-#include <regex>
 #include <fstream>
 #include <map>
 #include <iomanip>
+#include <stdio.h>
+#include <ctype.h>
 
 using namespace std;
 //fileCountMap[filename][lines]   fileCountMap[filename][words]  fileCountMap[filename][chars]
@@ -77,23 +78,61 @@ int doesExistFile(string &f){
 }
 // ------------------------------ GET WORDS ---------------------------------
 string *getWords(string &in, string &filename){
-    smatch sm;
-    regex wordReg ("\\s+"); //finds spaces, which we'll use to split up the words
-    sregex_token_iterator reg_end;
+	int inSpace = 0;
+	currWordLength = 0;
+	int i = 0;
 
-    int i = 0;
-    int tokenCount = 0;
-    string tempy = "";
-    for(sregex_token_iterator it(in.begin(), in.end(), wordReg, -1); it != reg_end; ++it) {
-        i++;
-    }
-    currWordLength = i;
-    string *newWords = new string[i];
-    int j = 0;
-    for(sregex_token_iterator it(in.begin(), in.end(), wordReg, -1); it != reg_end; ++it) {
-        newWords[j] = it->str();
-        j++;
-    }
+	if(!isspace(in[i])){
+		currWordLength++;
+	} else {
+		inSpace = 1;
+	}
+
+	while(i < in.length()){
+
+		while(!inSpace && (i<in.length())){
+			if(isspace(in[i])){
+				inSpace = 1;
+				currWordLength++;
+			}
+			i++;
+		}
+		while(inSpace && (i<in.length())){
+			if(!isspace(in[i])){
+				inSpace = 0;
+			}
+			i++;
+		}
+	}
+
+	i = 0;
+	int j = 0;
+
+	string *newWords = new string[currWordLength];
+
+	while(i < in.length()){
+
+		while(!inSpace && (i<in.length())){
+
+			if(isspace(in[i])){
+				inSpace = 1;
+				j++;
+			} else {
+				newWords[j] += in[i];
+			}
+			i++;
+			
+		}
+		while(inSpace && (i<in.length())){
+			if(!isspace(in[i])){
+				newWords[j] += in[i];
+				inSpace = 0;
+			}
+			i++;
+		}
+	}
+
+    
     return newWords;
 }
 
@@ -200,7 +239,6 @@ int fileParser(string &filename){
 	int wordsLength;
 
 	while(getline(file, line)){
-			currWordLength = 0;
 
 			if(!line.length()) continue;
 
@@ -246,13 +284,8 @@ int main(int argc, const char * argv[]) {
     		fileParser(files[i]);
     	}
     }
-    printResults();
-    //FOR EVERY FILE
-    // READ FILE
-    // Search each line 
-    // Put lines into array
-    //
 
+    printResults();
 
     return 0;
 }
