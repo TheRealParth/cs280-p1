@@ -13,6 +13,7 @@
 #include <map>
 
 using namespace std;
+//fileCountMap[filename][lines]   fileCountMap[filename][words]  fileCountMap[filename][chars]
 
 map <string, map <string, int>> fileCountMap;
 map <char, map <string, map <string, int>>> charCountMap;
@@ -20,6 +21,7 @@ map <string, map <string, map <string, int>>> wordCountMap;
 
 map <int, char> chars;
 map <int, string> words;
+map <int, string> files;
 
 string word;
 string findChar = "-findchar=";
@@ -32,17 +34,17 @@ int fileCount = 0;
 //----------------------------- ERROR HANDLERS -------------------------------
 int poorlyFormedError(string &arg){
 	cout << "Argument "  <<  arg << " is poorly formed" << endl;
-	return 0;
+	exit(0);
 }
 
 int notRecognizedError(string &arg){
 	cout << "Argument "  <<  arg << " is not recognized" << endl;
-	return 0;
+	exit(0);
 }
 
 int fileNotFoundError(string &filename){
 	cout << "File " << filename << " is not found" << endl;
-	return 0;
+	exit(0);
 }
 
 // ------------------------------ DOES EXIST FUNCTIONS ---------------------------------
@@ -62,6 +64,14 @@ int doesExistWord(string &w){
 	}
 	return 0;
 }
+int doesExistFile(string &f){
+		for(int i = 0; i < fileCount; i++){
+		if(!files[i].compare(f)){
+			return 1;
+		}
+	}
+	return 0;
+}
 // ------------------------------ GET WORDS ---------------------------------
 string *getWords(string &in){
     smatch sm;
@@ -75,12 +85,9 @@ string *getWords(string &in){
         i++;
     }
     string *newWords = new string[i];
-    int wordCount = i;
-    int letterCount = 0;
     int j = 0;
     for(sregex_token_iterator it(in.begin(), in.end(), wordReg, -1); it != reg_end; ++it) {
         newWords[j] = it->str();
-        letterCount += newWords[j].length();
         j++;
     }
     return newWords;
@@ -136,13 +143,56 @@ int flagHandler(string &flag){
 	return 0;
 }
 // ------------------------------ FILE HANDLER ---------------------------------
-// int fileHandler(string &filename){
-// 	fileCount++;
-// 	return 0;
-// }
+int fileHandler(string &filename){
+	int doesExist = doesExistFile(filename);
+	if(!doesExist){
+		files[fileCount] = filename;
+		fileCount++;
+	}
+	return 0;
+}
 
+// ------------------------------- FILE READER ---------------------------------
+int fileParser(string &filename){
+	string line;
+	int wordCount = 0;
+	int charCount = 0;
+
+	fileCountMap[filename]["lines"] = 0;
+	fileCountMap[filename]["words"] = 0;
+	fileCountMap[filename]["chars"] = 0;
+
+	ifstream file (filename);
+
+	if(!file.is_open()) fileNotFoundError(filename);
+
+	cout << "File to read: " << filename << endl;
+	int i = 0;
+	int wordsLength;
+	while(getline(file, line)){
+			wordsLength = 0;
+
+			if(!line.length()) continue;
+
+			fileCountMap[filename]["lines"] += line.length();
+
+			string *words = getWords(line);
+			wordsLength = sizeof(words[0])/sizeof(words);
+
+			fileCountMap[filename]["words"] += wordsLength;
+
+			cout << wordsLength << endl;
+			for(int j = 0; j < wordsLength; j++){
+				cout << words[j] << endl;
+			}
+		fileCountMap[filename]["lines"]++;
+	}
+
+	return 0;
+}
+
+// ---------------------------------- MAIN -------------------------------------
 int main(int argc, const char * argv[]) {
-
 
     for(int i = 1; i < argc; i++){
 
@@ -151,12 +201,21 @@ int main(int argc, const char * argv[]) {
     	if(word[0] == '-'){
     		flagHandler(word);
 		} else {
-			// fileHandler(word);
-			fileCount++;
+			fileHandler(word);
 		}
 
     }
 
+    if(!fileCount){
+    	// IF NO FILE READ FROM STDIN
+    	cout << "READING FROM STDIN" << endl;
+
+    } else {
+    	for(int i = 0; i < fileCount; i++){
+    		fileParser(files[i]);
+    	}
+    }
+    
     //FOR EVERY FILE
     // READ FILE
     // Search each line 
