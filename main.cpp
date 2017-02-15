@@ -11,6 +11,7 @@
 #include <regex>
 #include <fstream>
 #include <map>
+#include <iomanip>
 
 using namespace std;
 //fileCountMap[filename][lines]   fileCountMap[filename][words]  fileCountMap[filename][chars]
@@ -87,7 +88,6 @@ string *getWords(string &in, string &filename){
         i++;
     }
     currWordLength = i;
-    cout << "LENGTH : " << i << endl;
     string *newWords = new string[i];
     int j = 0;
     for(sregex_token_iterator it(in.begin(), in.end(), wordReg, -1); it != reg_end; ++it) {
@@ -119,7 +119,6 @@ int flagHandler(string &flag){
 	    	int doesExist = doesExistChar(word[10]);
 	    	//add to chars map
 	    	if(!doesExist){
-	    		cout << "Search Char: " << word[10] << endl;
 	    		chars[findCharCount] = word[10];
 	    		findCharCount++;
 	    	}
@@ -135,7 +134,6 @@ int flagHandler(string &flag){
 	    	int doesExist = doesExistWord(searchWord);
 	    	//add to chars map
 	    	if(!doesExist){
-	    		cout << "Search Word: " << searchWord << endl;
 	    		words[findWordCount] = searchWord;
 	    		findWordCount++;
 	    	}
@@ -157,18 +155,30 @@ int fileHandler(string &filename){
 }
 // ------------------------------ PRINT RESULTS --------------------------------
 int printResults(){
+	int totalLines = 0;
+	int totalWords = 0;
+	int totalChars = 0;
+
 	if(fileCount){
 		for(int i = 0; i < fileCount; i ++ ) {
-			cout << fileCountMap[files[i]]["lines"] << " ";
-			cout << fileCountMap[files[i]]["words"] << " ";
-			cout << fileCountMap[files[i]]["chars"] << " ";
-			cout << files[i] << endl;
+			cout << setw(12) << right << fileCountMap[files[i]]["lines"]
+			     << setw(12) << right << fileCountMap[files[i]]["words"]
+				 << setw(12) << right << fileCountMap[files[i]]["chars"]
+				 << setw(12) << left << " " + files[i] << endl;
+
+			totalLines += fileCountMap[files[i]]["lines"];
+			totalWords += fileCountMap[files[i]]["words"];
+			totalChars += fileCountMap[files[i]]["chars"];
 		}
 	} else {
 		//PRINT STDIN results
 	}
 	if(fileCount > 1){
 		//PRINT TOTALS
+		cout << setw(12) << right << totalLines
+			<< setw(12) << right << totalWords 
+			<< setw(12) << right << totalChars
+			<< setw(12) << left << " total" << endl;
 	}
 	return 0;
 }
@@ -186,7 +196,6 @@ int fileParser(string &filename){
 
 	if(!file.is_open()) fileNotFoundError(filename);
 
-	cout << "File to read: " << filename << endl;
 	int i = 0;
 	int wordsLength;
 
@@ -198,21 +207,18 @@ int fileParser(string &filename){
 			fileCountMap[filename]["chars"] += line.length();
 
 			string *words = getWords(line, filename);
-			
-
-
-
+			//ADD TO
+			//ADD TO LETTER OCCURANCES IN UNIQUE LINES
+			//ADD TO TOTAL LETTER OCCURANCES
 			// cout << wordsLength << endl;
 			fileCountMap[filename]["words"] += currWordLength;
 			for(int j = 0; j < currWordLength; j++){
-				// cout << words[j] << " ";
-				cout << words[j] << " ";
+				//LETTER APPEARS IN WORD?
+				//MATCHES WORD? ADD 1 TO WORD
 			}
-			cout << endl;
 		fileCountMap[filename]["lines"]++;
 	}
 	
-	printResults();
 	return 0;
 }
 
@@ -240,17 +246,12 @@ int main(int argc, const char * argv[]) {
     		fileParser(files[i]);
     	}
     }
-    
+    printResults();
     //FOR EVERY FILE
     // READ FILE
     // Search each line 
     // Put lines into array
     //
-		cout << "-----------------------------" << endl;
-		cout << "Word count: " << findWordCount << endl;
-		cout << "Letter count: " << findCharCount << endl;
-		cout << "File count: " << fileCount << endl;
-		cout << "-----------------------------" << endl;
 
 
     return 0;
