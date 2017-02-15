@@ -31,6 +31,8 @@ int findCharCount = 0;
 int findWordCount = 0;
 int fileCount = 0;
 
+int currWordLength = 0;
+
 //----------------------------- ERROR HANDLERS -------------------------------
 int poorlyFormedError(string &arg){
 	cout << "Argument "  <<  arg << " is poorly formed" << endl;
@@ -73,7 +75,7 @@ int doesExistFile(string &f){
 	return 0;
 }
 // ------------------------------ GET WORDS ---------------------------------
-string *getWords(string &in){
+string *getWords(string &in, string &filename){
     smatch sm;
     regex wordReg ("\\s+"); //finds spaces, which we'll use to split up the words
     sregex_token_iterator reg_end;
@@ -84,6 +86,8 @@ string *getWords(string &in){
     for(sregex_token_iterator it(in.begin(), in.end(), wordReg, -1); it != reg_end; ++it) {
         i++;
     }
+    currWordLength = i;
+    cout << "LENGTH : " << i << endl;
     string *newWords = new string[i];
     int j = 0;
     for(sregex_token_iterator it(in.begin(), in.end(), wordReg, -1); it != reg_end; ++it) {
@@ -151,7 +155,23 @@ int fileHandler(string &filename){
 	}
 	return 0;
 }
-
+// ------------------------------ PRINT RESULTS --------------------------------
+int printResults(){
+	if(fileCount){
+		for(int i = 0; i < fileCount; i ++ ) {
+			cout << fileCountMap[files[i]]["lines"] << " ";
+			cout << fileCountMap[files[i]]["words"] << " ";
+			cout << fileCountMap[files[i]]["chars"] << " ";
+			cout << files[i] << endl;
+		}
+	} else {
+		//PRINT STDIN results
+	}
+	if(fileCount > 1){
+		//PRINT TOTALS
+	}
+	return 0;
+}
 // ------------------------------- FILE READER ---------------------------------
 int fileParser(string &filename){
 	string line;
@@ -169,25 +189,30 @@ int fileParser(string &filename){
 	cout << "File to read: " << filename << endl;
 	int i = 0;
 	int wordsLength;
+
 	while(getline(file, line)){
-			wordsLength = 0;
+			currWordLength = 0;
 
 			if(!line.length()) continue;
 
-			fileCountMap[filename]["lines"] += line.length();
+			fileCountMap[filename]["chars"] += line.length();
 
-			string *words = getWords(line);
-			wordsLength = sizeof(words[0])/sizeof(words);
+			string *words = getWords(line, filename);
+			
 
-			fileCountMap[filename]["words"] += wordsLength;
 
-			cout << wordsLength << endl;
-			for(int j = 0; j < wordsLength; j++){
-				cout << words[j] << endl;
+
+			// cout << wordsLength << endl;
+			fileCountMap[filename]["words"] += currWordLength;
+			for(int j = 0; j < currWordLength; j++){
+				// cout << words[j] << " ";
+				cout << words[j] << " ";
 			}
+			cout << endl;
 		fileCountMap[filename]["lines"]++;
 	}
-
+	
+	printResults();
 	return 0;
 }
 
