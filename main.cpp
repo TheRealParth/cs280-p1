@@ -212,7 +212,7 @@ int printResults(){
 			cout << setw(12) << right << fileCountMap[files[i]]["lines"]
 			     << setw(12) << right << fileCountMap[files[i]]["words"]
 				 << setw(12) << right << fileCountMap[files[i]]["chars"]
-				 << setw(12) << left << " " + files[i] << endl;
+				 << left << " " + files[i] << endl;
 
 			totalLines += fileCountMap[files[i]]["lines"];
 			totalWords += fileCountMap[files[i]]["words"];
@@ -223,7 +223,7 @@ int printResults(){
 			cout << setw(12) << right << totalLines
 				<< setw(12) << right << totalWords 
 				<< setw(12) << right << totalChars
-				<< setw(12) << left << " total" << endl;
+				<< left << " totals" << endl;
 		}
 		//PRINT WORDS ===================================
 		for(int i=0; i < findWordCount; i++){
@@ -233,7 +233,7 @@ int printResults(){
 				cout << left << words[i] + ":"
 					<< setw(12) << right << wordCountMap[words[i]][files[j]]["lines"]
 					<< setw(12) << right << wordCountMap[words[i]][files[j]]["words"]
-			    	<< setw(12) << left << " " + files[j] << endl;
+			    	<< left << " " + files[j] << endl;
 
 			    totalLines += wordCountMap[words[i]][files[j]]["lines"];
 			    totalWords += wordCountMap[words[i]][files[j]]["words"];
@@ -242,7 +242,7 @@ int printResults(){
 				cout << left << words[i] + ":"
 					<< setw(12) << right << totalLines
 					<< setw(12) << right << totalWords 
-					<< setw(12) << left << " total" << endl;
+					<< left << " totals" << endl;
 			}
 
 		}
@@ -257,7 +257,7 @@ int printResults(){
 				 	<< setw(12) << right << charCountMap[chars[i]][files[j]]["lines"]
 				 	<< setw(12) << right << charCountMap[chars[i]][files[j]]["words"]
 				 	<< setw(12) << right << charCountMap[chars[i]][files[j]]["chars"]
-			    	<< setw(12) << left << " " + files[j] << endl;
+			    	<< left << " " + files[j] << endl;
 			    totalChars += charCountMap[chars[i]][files[j]]["chars"];
 			    totalLines += charCountMap[chars[i]][files[j]]["lines"];
 			    totalWords += charCountMap[chars[i]][files[j]]["words"];
@@ -268,7 +268,7 @@ int printResults(){
 					<< setw(12) << right << totalLines
 					<< setw(12) << right << totalWords
 					<< setw(12) << right << totalChars 
-					<< setw(12) << left << " total" << endl;
+					<< left << " totals" << endl;
 			}
 		}
 	} else {
@@ -394,6 +394,7 @@ int stdinParser(){
 		wordCountMap[words[i]]["stdin"]["lines"] = 0;
 		wordCountMap[words[i]]["stdin"]["words"] = 0;
 	}
+
 	while (getline(cin, line)) {
 		if(cin.eof()) break;
 
@@ -415,6 +416,7 @@ int stdinParser(){
 				foundWord = 0;
 			}
 		}
+
 		int foundChar = 0;
 		int foundCharCount;
 		for(int i=0; i < findCharCount; i++){
@@ -437,7 +439,8 @@ int stdinParser(){
 				foundChar = 0;
 			}
 		}
-
+		
+		stdinCountMap["words"]  += currWordLength;
 
 	}
 
