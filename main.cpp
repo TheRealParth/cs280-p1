@@ -22,7 +22,6 @@ map <char, map <string, map <string, int>>> charCountMap;
 map <string, map <string, map <string, int>>> wordCountMap;
 map <string, int> stdinCountMap;
 
-
 map <int, char> chars;
 map <int, string> words;
 map <int, string> files;
@@ -53,6 +52,38 @@ int fileNotFoundError(string &filename){
 	exit(0);
 }
 
+// ----------------------------------- SORT CHARS AND WORDS --------------------------------------
+int alphabetize(){
+	int charsSorted = 0;
+	int wordsSorted = 0;
+
+	while (!charsSorted){
+		charsSorted = 1;
+		for(int i = 0; i < findCharCount - 1; i++){
+			char temp;
+			if(chars[i] > chars[i+1]){
+				charsSorted = 0;
+				temp = chars[i+1];
+				chars[i+1] = chars[i];
+				chars[i] = temp;
+			}
+		}
+	}
+
+	while (!wordsSorted){
+		wordsSorted = 1;
+		for(int i = 0; i < findWordCount - 1; i++){
+			string temp;
+			if(words[i].compare(words[i+1]) > 0){
+				wordsSorted = 0;
+				temp = words[i+1];
+				words[i+1] = words[i];
+				words[i] = temp;
+			}
+		}
+	}
+	return 0;
+}
 // ------------------------------ DOES EXIST FUNCTIONS ---------------------------------
 int doesExistChar(char &c){
 	for(int i = 0; i < findCharCount; i++){
@@ -203,6 +234,7 @@ int fileHandler(string &filename){
 }
 // ------------------------------ PRINT RESULTS --------------------------------
 int printResults(){
+	alphabetize();
 	int totalLines = 0;
 	int totalWords = 0;
 	int totalChars = 0;
@@ -274,13 +306,13 @@ int printResults(){
 	} else {
 		cout << setw(12) << right << stdinCountMap["lines"]
 		     << setw(12) << right << stdinCountMap["words"]
-			 << setw(12) << right << stdinCountMap["chars"] << endl;
+			 << setw(12) << right << stdinCountMap["chars"] <<  " " << endl;
 
 		//PRINT WORDS ===================================
 		for(int i=0; i < findWordCount; i++){
 			cout << left << words[i] + ":"
 				<< setw(12) << right << wordCountMap[words[i]]["stdin"]["lines"]
-				<< setw(12) << right << wordCountMap[words[i]]["stdin"]["words"]
+				<< setw(12) << right << wordCountMap[words[i]]["stdin"]["words"] << " "
 		    	<< endl;
 		}
 		//PRINT CHARS ===================================
@@ -292,7 +324,7 @@ int printResults(){
 			cout << left << chars[i] << ':'
 			 	<< setw(12) << right << charCountMap[chars[i]]["stdin"]["lines"]
 			 	<< setw(12) << right << charCountMap[chars[i]]["stdin"]["words"]
-			 	<< setw(12) << right << charCountMap[chars[i]]["stdin"]["chars"]
+			 	<< setw(12) << right << charCountMap[chars[i]]["stdin"]["chars"] << " "
 		        << endl;
 		}
 	}
@@ -329,7 +361,6 @@ int fileParser(string &filename){
 		fileCountMap[filename]["lines"]++;
 		fileCountMap[filename]["chars"]+= line.length() + 1;
 		if(!line.length()) continue;
-
 
 
 		string *sWords = getWords(line);
@@ -439,7 +470,7 @@ int stdinParser(){
 				foundChar = 0;
 			}
 		}
-		
+
 		stdinCountMap["words"]  += currWordLength;
 
 	}
